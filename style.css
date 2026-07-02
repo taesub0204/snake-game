@@ -1,0 +1,567 @@
+/* CSS resets and custom variables */
+:root {
+    --bg-color: #0d0d0f;
+    --container-bg: rgba(16, 16, 18, 0.95);
+    --border-color: #444448;
+    --text-main: #d8d8d8;
+    --text-muted: #77777a;
+    --canvas-bg: #050505;
+    --canvas-grid: #0d0d0f;
+    
+    --snake-color: #e0e0e0;
+    --food-color: #ffffff;
+    --accent-color: #d8d8d8;
+    
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.6);
+    --shadow-md: 0 8px 16px rgba(0,0,0,0.8);
+    --shadow-lg: 0 16px 32px rgba(0,0,0,0.95);
+    
+    --border-radius: 4px; /* Boxy retro style */
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'VT323', monospace;
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    overflow-x: hidden;
+    letter-spacing: 1px;
+    /* Vintage arcade cabinet scanline background */
+    background-image: radial-gradient(circle, #1a1a1f 0%, #050507 100%);
+}
+
+/* Layout Container */
+.game-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    max-width: 1200px;
+    width: 100%;
+}
+
+/* Game Header */
+.game-header {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+.header-title {
+    font-size: 42px;
+    font-weight: bold;
+    letter-spacing: 4px;
+    color: var(--text-main);
+    text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+    display: inline-flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.header-dot {
+    width: 12px;
+    height: 12px;
+    background-color: #ff3b30;
+    border-radius: 50%;
+    animation: pulse 1.2s infinite ease-in-out;
+    box-shadow: 0 0 8px #ff3b30;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.3); opacity: 0.5; }
+}
+
+/* Game Layout (Sidebar + Canvas Container) */
+.game-layout {
+    display: flex;
+    gap: 25px;
+    align-items: stretch;
+    width: 100%;
+    justify-content: center;
+}
+
+.canvas-container-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-grow: 1;
+    max-width: 800px;
+}
+
+/* Canvas Wrapper & Canvas */
+.canvas-area {
+    position: relative;
+    width: 800px;
+    height: 800px;
+    max-width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg), 0 0 20px rgba(255,255,255,0.05);
+    border: 4px solid var(--border-color);
+    background-color: var(--canvas-bg);
+    /* Subtle CRT monitor screen flicker */
+    animation: crt-flicker 0.15s infinite;
+}
+
+@keyframes crt-flicker {
+    0% { opacity: 0.99; }
+    50% { opacity: 1; }
+    100% { opacity: 0.99; }
+}
+
+/* CRT Scanlines Overlay */
+.crt-scanlines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        rgba(18, 16, 16, 0) 50%, 
+        rgba(0, 0, 0, 0.35) 50%
+    );
+    background-size: 100% 4px;
+    pointer-events: none;
+    z-index: 12;
+}
+
+canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* Screen Overlays (Start, Game Over, Pause) */
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(5, 5, 5, 0.95); /* Deep retro black overlay */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s ease, visibility 0.3s;
+    z-index: 10;
+    text-align: center;
+}
+
+.overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.overlay-title {
+    font-size: 64px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: var(--text-main);
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px rgba(255,255,255,0.7);
+}
+
+.overlay-subtitle {
+    font-size: 24px;
+    color: var(--text-muted);
+    margin-bottom: 30px;
+    max-width: 550px;
+    text-align: center;
+    line-height: 1.4;
+    padding: 0 20px;
+}
+
+.btn {
+    background-color: transparent;
+    color: var(--text-main);
+    border: 2px solid var(--text-main);
+    border-radius: 0; /* Fully boxy retro look */
+    padding: 10px 30px;
+    font-size: 24px;
+    font-family: 'VT323', monospace;
+    cursor: pointer;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    background-color: var(--text-main);
+    color: #050505;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+/* Game Over Retry Buttons */
+.game-over-buttons {
+    display: flex;
+    gap: 20px;
+    margin-top: 15px;
+}
+
+.btn-no {
+    border-color: #888;
+    color: #888;
+    box-shadow: 0 0 8px rgba(136, 136, 136, 0.2);
+}
+
+.btn-no:hover {
+    background-color: #888;
+    color: #050505;
+    box-shadow: 0 0 15px rgba(136, 136, 136, 0.8);
+}
+
+/* Sidebar Container (Scores & Guide) */
+.sidebar {
+    width: 280px;
+    background: var(--container-bg);
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 30px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    box-shadow: var(--shadow-md);
+}
+
+/* Scores panel */
+.score-card {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border-color);
+    border-radius: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+}
+
+.score-text-line {
+    font-size: 26px;
+    font-weight: bold;
+    color: var(--text-main);
+    text-shadow: 0 0 5px rgba(220, 220, 220, 0.5);
+}
+
+#display-score {
+    color: #ffffff;
+}
+
+#display-highscore {
+    color: var(--text-muted);
+}
+
+/* Controls Guide */
+.guide-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.guide-panel h3 {
+    font-size: 22px;
+    font-weight: bold;
+    color: var(--text-main);
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 8px;
+    text-shadow: 0 0 4px rgba(255,255,255,0.3);
+}
+
+.guide-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.guide-label {
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--text-muted);
+}
+
+.guide-keys {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+}
+
+.key {
+    background: #1e1e24;
+    border: 1px solid var(--border-color);
+    border-radius: 0;
+    padding: 2px 8px;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0 2px 0 #000;
+    display: inline-block;
+    color: var(--text-main);
+}
+
+/* Retro NES Gamepad Controller (Mobile & Touch) */
+.nes-controller {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 480px;
+    height: 150px;
+    margin-top: 25px;
+    background-color: #cccccc; /* Retro controller gray */
+    border: 4px solid #333333;
+    border-radius: 12px;
+    padding: 10px 24px;
+    box-shadow: 0 8px 0 #555555, 0 15px 25px rgba(0,0,0,0.4);
+    position: relative;
+}
+
+/* Controller inner details stripe */
+.nes-controller::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 24px;
+    height: 12px;
+    background: repeating-linear-gradient(
+        90deg,
+        #999999,
+        #999999 10px,
+        #ff3b30 10px,
+        #ff3b30 20px
+    );
+    border-top: 2px solid #333;
+    border-bottom: 2px solid #333;
+    opacity: 0.15;
+    pointer-events: none;
+}
+
+/* D-pad Cross */
+.nes-dpad {
+    position: relative;
+    width: 90px;
+    height: 90px;
+}
+
+.nes-dpad-btn {
+    position: absolute;
+    background: #222222;
+    border: 2px solid #111111;
+    color: #777777;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    outline: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+    box-shadow: inset 0 2px 2px rgba(255,255,255,0.1);
+}
+
+.nes-dpad-btn:active {
+    background-color: #000000;
+    color: #ffffff;
+}
+
+.nes-up {
+    top: 0; left: 30px;
+    width: 30px; height: 32px;
+    border-radius: 4px 4px 0 0;
+    border-bottom: none;
+}
+
+.nes-left {
+    top: 30px; left: 0;
+    width: 32px; height: 30px;
+    border-radius: 4px 0 0 4px;
+    border-right: none;
+}
+
+.nes-dpad-center {
+    position: absolute;
+    top: 30px; left: 30px;
+    width: 30px; height: 30px;
+    background: #222222;
+    z-index: 2;
+}
+
+.nes-dpad-center::after {
+    content: "";
+    display: block;
+    width: 10px;
+    height: 10px;
+    background: #111;
+    border-radius: 50%;
+    margin: 10px;
+}
+
+.nes-right {
+    top: 30px; left: 60px;
+    width: 32px; height: 30px;
+    border-radius: 0 4px 4px 0;
+    border-left: none;
+}
+
+.nes-down {
+    top: 60px; left: 30px;
+    width: 30px; height: 32px;
+    border-radius: 0 0 4px 4px;
+    border-top: none;
+}
+
+/* Select / Start buttons (slanted rubber pads) */
+.nes-menu-buttons {
+    display: flex;
+    gap: 12px;
+    transform: translateY(10px);
+}
+
+.nes-menu-btn-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.nes-menu-btn {
+    width: 34px;
+    height: 12px;
+    background: #7a7a7a;
+    border: 2px solid #333;
+    border-radius: 6px;
+    transform: rotate(-15deg);
+    cursor: pointer;
+    outline: none;
+    box-shadow: inset 0 2px 2px rgba(255,255,255,0.2), 0 2px 0 #555555;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.nes-menu-btn:active {
+    transform: rotate(-15deg) translateY(1px);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);
+}
+
+.nes-menu-label {
+    font-size: 11px;
+    font-weight: bold;
+    color: #555555;
+    text-transform: uppercase;
+}
+
+/* Action Buttons A / B */
+.nes-action-buttons {
+    display: flex;
+    gap: 16px;
+}
+
+.nes-action-btn-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    position: relative;
+}
+
+/* Dark plastic circular button recess background */
+.nes-action-btn-wrapper::before {
+    content: "";
+    position: absolute;
+    top: -3px;
+    width: 38px;
+    height: 38px;
+    background-color: #999999;
+    border: 2px solid #666666;
+    border-radius: 50%;
+    z-index: 0;
+}
+
+.nes-action-btn {
+    position: relative;
+    z-index: 1;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid #333333;
+    background-color: #ff3b30; /* Classic red NES button */
+    color: #333;
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    outline: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 0 2px 2px rgba(255,255,255,0.3), 0 2px 0 #222222;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.nes-action-btn:active, .nes-action-btn.active {
+    transform: translateY(1px);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.6);
+    background-color: #cc241d;
+}
+
+.nes-action-label {
+    font-size: 12px;
+    font-weight: bold;
+    color: #555555;
+    z-index: 2;
+}
+
+/* Responsive Layout Breakpoints */
+@media (max-width: 1120px) {
+    .game-layout {
+        flex-direction: column;
+        align-items: center;
+    }
+    .sidebar {
+        width: 100%;
+        max-width: 800px;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+    }
+    .score-panel {
+        flex: 1;
+        min-width: 200px;
+    }
+    .guide-panel {
+        flex: 1.5;
+        min-width: 250px;
+    }
+}
+
+@media (max-width: 600px) {
+    .sidebar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+    .score-panel, .guide-panel {
+        width: 100%;
+    }
+}

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>지렁이 게임 (Retro Snake Game)</title>
+    <!-- Google Fonts - VT323 Monospace Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <!-- Link External CSS Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="game-wrapper">
+    <!-- Game Header -->
+    <header class="game-header">
+        <h1 class="header-title">TAESUB GAMES<span class="header-dot"></span></h1>
+    </header>
+
+    <!-- Game Layout Container -->
+    <div class="game-layout">
+        
+        <!-- Left Column: Game Canvas and Gamepad -->
+        <div class="canvas-container-wrapper">
+            <div class="canvas-area">
+                <div class="crt-scanlines"></div>
+                <canvas id="game-canvas" width="800" height="800"></canvas>
+
+                <!-- Start Overlay -->
+                <div class="overlay" id="start-overlay">
+                    <h2 class="overlay-title">SNAKE GAME</h2>
+                    <p class="overlay-subtitle">방향키(←↑↓→) 또는 WASD 키를 사용하여 지렁이를 조종하세요. 먹이를 먹을 때마다 점수가 올라가고 속도가 빨라집니다.</p>
+                    <button class="btn" id="start-btn">GAME START</button>
+                </div>
+
+                <!-- Pause Overlay -->
+                <div class="overlay hidden" id="pause-overlay">
+                    <h2 class="overlay-title">PAUSED</h2>
+                    <p class="overlay-subtitle">게임이 일시정지 되었습니다. 다시 시작하려면 버튼을 누르거나 스페이스바를 누르세요.</p>
+                    <button class="btn" id="resume-btn">RESUME</button>
+                </div>
+
+                <!-- Game Over Overlay -->
+                <div class="overlay hidden" id="game-over-overlay">
+                    <h2 class="overlay-title" style="color: #ff3b30; text-shadow: 0 0 10px #ff3b30;">GAME OVER</h2>
+                    <p class="overlay-subtitle">지렁이가 벽이나 자신의 몸에 부딪혔습니다. 최종 점수: <strong id="final-score" style="color: #ffffff; text-shadow: 0 0 5px #fff;">0</strong>점</p>
+                    <div class="overlay-subtitle" style="margin-bottom: 15px; font-size: 28px;">RETRY? (다시 하겠습니까?)</div>
+                    <div class="game-over-buttons">
+                        <button class="btn btn-retry" id="retry-btn">YES (예)</button>
+                        <button class="btn btn-no" id="no-btn">NO (아니오)</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Retro NES Gamepad -->
+            <div class="nes-controller">
+                <!-- D-pad cross -->
+                <div class="nes-dpad">
+                    <button class="nes-dpad-btn nes-up" id="btn-up">▲</button>
+                    <button class="nes-dpad-btn nes-left" id="btn-left">◀</button>
+                    <div class="nes-dpad-center"></div>
+                    <button class="nes-dpad-btn nes-right" id="btn-right">▶</button>
+                    <button class="nes-dpad-btn nes-down" id="btn-down">▼</button>
+                </div>
+                
+                <!-- Menu / Pause buttons -->
+                <div class="nes-menu-buttons">
+                    <div class="nes-menu-btn-wrapper">
+                        <button class="nes-menu-btn" id="btn-pause"></button>
+                        <span class="nes-menu-label">PAUSE</span>
+                    </div>
+                    <div class="nes-menu-btn-wrapper">
+                        <button class="nes-menu-btn" id="btn-start-restart"></button>
+                        <span class="nes-menu-label">RESET</span>
+                    </div>
+                </div>
+                
+                <!-- Action buttons A / B -->
+                <div class="nes-action-buttons">
+                    <div class="nes-action-btn-wrapper">
+                        <button class="nes-action-btn" id="btn-action-b">B</button>
+                        <span class="nes-action-label">B</span>
+                    </div>
+                    <div class="nes-action-btn-wrapper">
+                        <button class="nes-action-btn" id="btn-action-a">BOOST</button>
+                        <span class="nes-action-label">A</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Sidebar (Scoreboard & Instructions) -->
+        <div class="sidebar">
+            <div class="score-panel">
+                <div class="score-card">
+                    <div class="score-text-line" id="display-score">점수 : 0</div>
+                    <div class="score-text-line" id="display-highscore">최고 점수 : 0</div>
+                </div>
+            </div>
+            
+            <div class="guide-panel">
+                <h3>조작 안내</h3>
+                <div class="guide-item">
+                    <span class="guide-label">키보드</span>
+                    <div class="guide-keys">
+                        <span class="key">W</span> <span class="key">A</span> <span class="key">S</span> <span class="key">D</span>
+                        또는
+                        <span class="key">↑</span> <span class="key">←</span> <span class="key">↓</span> <span class="key">→</span>
+                    </div>
+                </div>
+                <div class="guide-item">
+                    <span class="guide-label">일시정지</span>
+                    <span class="key" style="width: auto; padding: 2px 10px;">Spacebar</span>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<!-- Link External JavaScript Game Logic -->
+<script src="game.js"></script>
+</body>
+</html>
