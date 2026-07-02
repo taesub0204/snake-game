@@ -557,15 +557,39 @@ canvas {
 
 @media (max-width: 600px) {
     body {
-        padding: 15px 10px;
+        padding: 10px;
+    }
+    .header-title {
+        font-size: 28px;
+        letter-spacing: 2px;
+    }
+    .canvas-container-wrapper {
+        width: 100%;
+    }
+    .canvas-area {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 1 / 1;
+    }
+    .overlay-title {
+        font-size: 38px;
+    }
+    .overlay-subtitle {
+        font-size: 16px;
+        margin-bottom: 20px;
+    }
+    .btn {
+        font-size: 20px;
+        padding: 8px 24px;
     }
     .nes-controller {
         flex-direction: column;
         height: auto;
-        padding: 20px 15px;
-        gap: 18px;
+        padding: 15px 10px;
+        gap: 15px;
         align-items: center;
-        max-width: 300px;
+        width: 100%;
+        max-width: 290px;
         margin-top: 15px;
         box-shadow: 0 6px 0 #555555, 0 10px 15px rgba(0,0,0,0.4);
     }
@@ -588,6 +612,7 @@ canvas {
         flex-direction: column;
         align-items: stretch;
         gap: 15px;
+        width: 100%;
     }
     .score-panel, .guide-panel {
         width: 100%;
