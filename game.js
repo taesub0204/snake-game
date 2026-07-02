@@ -19,6 +19,62 @@ let minSpeed = 55; // Maximum speed limit (minimum time step)
 let speedDecrement = 3; // How much speed steps up per food eaten
 let speedBoost = false; // Speed booster state (A button toggler)
 
+// Audio state variables
+let audioCtx = null;
+let soundMuted = false;
+
+// Initialize Audio Context on user gesture
+function initAudio() {
+    if (audioCtx) return; // Already initialized
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (AudioContextClass) {
+        audioCtx = new AudioContextClass();
+    }
+}
+
+// Unlock audio context if browser blocks it
+function triggerAudioInit() {
+    initAudio();
+    if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+}
+
+// Classic PC Speaker motherboard flat square wave beep
+function beep(frequency, duration) {
+    if (soundMuted || !audioCtx) return;
+    try {
+        const osc = audioCtx.createOscillator();
+        osc.type = 'square'; // Flat retro buzzer beep
+        osc.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+        osc.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+    } catch (e) {
+        console.error("Audio error:", e);
+    }
+}
+
+function playEatSound() {
+    beep(950, 0.08); // High short beep
+}
+
+function playGameOverSound() {
+    beep(180, 0.35); // Low flat buzz
+}
+
+function playPauseSound() {
+    beep(440, 0.06); // Mid menu beep
+}
+
+function playBoostSound() {
+    beep(600, 0.06); // Boost buzz
+}
+
+function playTurnSound() {
+    beep(1200, 0.012); // Very short high pitch click
+}
+
 // DOM Elements
 const startOverlay = document.getElementById('start-overlay');
 const pauseOverlay = document.getElementById('pause-overlay');
@@ -39,10 +95,22 @@ updateScoreDisplay();
 // Event listeners
 window.addEventListener('keydown', handleKeyDown);
 
-startBtn.addEventListener('click', startGame);
-resumeBtn.addEventListener('click', resumeGame);
-retryBtn.addEventListener('click', startGame);
-noBtn.addEventListener('click', showStartScreen);
+startBtn.addEventListener('click', () => {
+    triggerAudioInit();
+    startGame();
+});
+resumeBtn.addEventListener('click', () => {
+    triggerAudioInit();
+    resumeGame();
+});
+retryBtn.addEventListener('click', () => {
+    triggerAudioInit();
+    startGame();
+});
+noBtn.addEventListener('click', () => {
+    triggerAudioInit();
+    showStartScreen();
+});
 
 // Bind D-pad Buttons for touch/click controls
 bindDpadBtn('btn-up', 'up');
@@ -54,6 +122,7 @@ bindDpadBtn('btn-right', 'right');
 const pBtn = document.getElementById('btn-pause');
 const pHandler = (e) => {
     e.preventDefault();
+    triggerAudioInit();
     togglePause();
 };
 pBtn.addEventListener('touchstart', pHandler, { passive: false });
@@ -63,6 +132,7 @@ pBtn.addEventListener('click', pHandler);
 const rBtn = document.getElementById('btn-start-restart');
 const rHandler = (e) => {
     e.preventDefault();
+    triggerAudioInit();
     showStartScreen();
 };
 rBtn.addEventListener('touchstart', rHandler, { passive: false });
@@ -72,8 +142,10 @@ rBtn.addEventListener('click', rHandler);
 const aBtn = document.getElementById('btn-action-a');
 const aHandler = (e) => {
     e.preventDefault();
+    triggerAudioInit();
     speedBoost = !speedBoost;
     aBtn.classList.toggle('active');
+    playBoostSound();
 };
 aBtn.addEventListener('touchstart', aHandler, { passive: false });
 aBtn.addEventListener('click', aHandler);
@@ -82,6 +154,7 @@ aBtn.addEventListener('click', aHandler);
 const bBtn = document.getElementById('btn-action-b');
 const bHandler = (e) => {
     e.preventDefault();
+    triggerAudioInit();
     togglePause();
 };
 bBtn.addEventListener('touchstart', bHandler, { passive: false });
@@ -97,6 +170,7 @@ function bindDpadBtn(id, dir) {
     const btn = document.getElementById(id);
     const handler = (e) => {
         e.preventDefault();
+        triggerAudioInit();
         queueDirection(dir);
     };
     btn.addEventListener('touchstart', handler, { passive: false });
@@ -151,12 +225,14 @@ function pauseGame() {
     if (gameState !== 'playing') return;
     gameState = 'paused';
     pauseOverlay.classList.remove('hidden');
+    playPauseSound();
 }
 
 function resumeGame() {
     if (gameState !== 'paused') return;
     gameState = 'playing';
     pauseOverlay.classList.add('hidden');
+    playPauseSound();
     
     lastTime = performance.now();
     speedAccumulator = 0;
@@ -177,6 +253,7 @@ function showStartScreen() {
     gameState = 'start';
     gameOverOverlay.classList.add('hidden');
     startOverlay.classList.remove('hidden');
+    playPauseSound();
     initGame();
     draw();
 }
@@ -185,6 +262,7 @@ function gameOver() {
     gameState = 'gameover';
     finalScoreEl.textContent = score;
     gameOverOverlay.classList.remove('hidden');
+    playGameOverSound();
     
     if (score > highScore) {
         highScore = score;
@@ -194,6 +272,7 @@ function gameOver() {
 }
 
 function handleKeyDown(e) {
+    triggerAudioInit();
     const key = e.key;
 
     // Prevent browser scrolling with arrow keys / space
@@ -220,6 +299,7 @@ function handleKeyDown(e) {
     if (key === 'Shift') {
         speedBoost = !speedBoost;
         aBtn.classList.toggle('active');
+        playBoostSound();
         return;
     }
 
@@ -293,7 +373,11 @@ function gameLoop(timestamp) {
 
 function updateGame() {
     if (inputQueue.length > 0) {
-        direction = inputQueue.shift();
+        const nextDir = inputQueue.shift();
+        if (nextDir !== direction) {
+            direction = nextDir;
+            playTurnSound();
+        }
     }
     
     const head = { x: snake[0].x, y: snake[0].y };
@@ -352,6 +436,7 @@ function updateGame() {
         score += 10;
         updateScoreDisplay();
         spawnFood();
+        playEatSound();
     }
 
     snake = newSnake;
@@ -443,6 +528,28 @@ function drawFood() {
     // Reset shadow
     CTX.shadowBlur = 0;
 }
+
+// Sound toggle button event listener
+const soundToggleBtn = document.getElementById('btn-sound-toggle');
+const soundIcon = document.getElementById('sound-status-icon');
+const soundText = document.getElementById('sound-status-text');
+
+soundToggleBtn.addEventListener('click', () => {
+    triggerAudioInit();
+    soundMuted = !soundMuted;
+    if (soundMuted) {
+        soundIcon.textContent = '🔇';
+        soundText.textContent = 'OFF';
+        soundToggleBtn.style.color = '#77777a';
+        soundToggleBtn.style.borderColor = '#77777a';
+    } else {
+        soundIcon.textContent = '🔊';
+        soundText.textContent = 'ON';
+        soundToggleBtn.style.color = '#ffffff';
+        soundToggleBtn.style.borderColor = '#ffffff';
+        beep(600, 0.05); // Short feedback beep
+    }
+});
 
 // Initialize game layout and render first static frame
 initGame();
