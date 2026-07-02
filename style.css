@@ -556,6 +556,34 @@ canvas {
 }
 
 @media (max-width: 600px) {
+    body {
+        padding: 15px 10px;
+    }
+    .nes-controller {
+        flex-direction: column;
+        height: auto;
+        padding: 20px 15px;
+        gap: 18px;
+        align-items: center;
+        max-width: 300px;
+        margin-top: 15px;
+        box-shadow: 0 6px 0 #555555, 0 10px 15px rgba(0,0,0,0.4);
+    }
+    .nes-controller::before {
+        display: none; /* Hide NES stripe on mobile */
+    }
+    .nes-dpad {
+        order: 1; /* Centered Dpad on top */
+    }
+    .nes-menu-buttons {
+        order: 2; /* Menu buttons below Dpad */
+        transform: none;
+        gap: 20px;
+    }
+    .nes-action-buttons {
+        order: 3; /* Action buttons at the bottom */
+        gap: 25px;
+    }
     .sidebar {
         flex-direction: column;
         align-items: stretch;
